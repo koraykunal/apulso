@@ -1,45 +1,59 @@
 from rest_framework import serializers
-from .models import SubscriptionPlan, Subscription, BillingCycle
+from .models import Service, ServicePlan, UserServiceSubscription, UsageLog, BillingCycle
 
 
-class SubscriptionPlanSerializer(serializers.ModelSerializer):
+class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SubscriptionPlan
-        fields = '__all__'
+        model = Service
+        fields = ['id', 'service_type', 'name', 'description', 'is_active', 'icon']
 
 
-class SubscriptionSerializer(serializers.ModelSerializer):
-    plan = SubscriptionPlanSerializer(read_only=True)
-    workflows_remaining = serializers.ReadOnlyField()
-    executions_remaining = serializers.ReadOnlyField()
-    is_active = serializers.ReadOnlyField()
+class ServicePlanSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer(read_only=True)
 
     class Meta:
-        model = Subscription
+        model = ServicePlan
         fields = [
-            'id', 'plan', 'billing_cycle', 'status', 'start_date', 'end_date',
-            'auto_renew', 'current_workflow_count', 'current_execution_count',
-            'workflows_remaining', 'executions_remaining', 'is_active',
-            'created_at', 'updated_at'
+            'id', 'service', 'name', 'plan_type', 'description',
+            'price_monthly', 'price_yearly', 'usage_limit', 'features', 'is_active'
         ]
-        read_only_fields = [
-            'status', 'start_date', 'end_date', 'current_workflow_count',
-            'current_execution_count', 'created_at', 'updated_at'
+
+
+class UserServiceSubscriptionSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer(read_only=True)
+    plan = ServicePlanSerializer(read_only=True)
+    usage_percentage = serializers.IntegerField(read_only=True)
+    usage_remaining = serializers.IntegerField(read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = UserServiceSubscription
+        fields = [
+            'id', 'service', 'plan', 'billing_cycle', 'status',
+            'start_date', 'end_date', 'current_usage', 'usage_percentage',
+            'usage_remaining', 'is_active', 'auto_renew', 'created_at'
         ]
+
+
+class UsageLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UsageLog
+        fields = ['id', 'amount', 'description', 'metadata', 'created_at']
 
 
 class CreateSubscriptionSerializer(serializers.Serializer):
+    service_id = serializers.IntegerField()
     plan_id = serializers.IntegerField()
     billing_cycle = serializers.ChoiceField(choices=BillingCycle.choices)
     payment_method_id = serializers.CharField(required=False)
 
-    def validate_plan_id(self, value):
+    def validate(self, attrs):
         try:
-            plan = SubscriptionPlan.objects.get(id=value, is_active=True)
-            return value
-        except SubscriptionPlan.DoesNotExist:
-            raise serializers.ValidationError("Invalid or inactive plan")
+            service = Service.objects.get(id=attrs['service_id'], is_active=True)
+            plan = ServicePlan.objects.get(id=attrs['plan_id'], service=service, is_active=True)
+        except Service.DoesNotExist:
+            raise serializers.ValidationError("Invalid or inactive service")
+        except ServicePlan.DoesNotExist:
+            raise serializers.ValidationError("Invalid or inactive plan for this service")
 
-
-class CancelSubscriptionSerializer(serializers.Serializer):
-    reason = serializers.CharField(required=False, allow_blank=True)
+        return attrs

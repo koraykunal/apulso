@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.conf import settings
+from django.http import HttpResponse
 import uuid
 import json
 
@@ -144,3 +146,5 @@ class InvoiceDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Invoice.objects.filter(payment__user=self.request.user)
+
+

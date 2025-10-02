@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 import logging
 
 from .models import TryOnRequest, TryOnRequestStatus
@@ -14,10 +15,12 @@ from .serializers import (
 )
 from .services import FalAITryOnService
 from core.models import DemoInvitation, DemoUsageLog
+from subscriptions.decorators import require_service_access
 
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(require_service_access('tryon', increment_usage=True), name='dispatch')
 class TryOnRequestCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 

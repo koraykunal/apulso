@@ -19,3 +19,4 @@ gunicorn
 fal-client
 boto3
 django-storages
+django-ses

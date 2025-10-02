@@ -41,13 +41,7 @@ class Payment(models.Model):
     metadata = models.JSONField(default=dict)
 
     subscription_id = models.ForeignKey(
-        'subscriptions.Subscription',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-    workflow_id = models.ForeignKey(
-        'workflows.Workflow',
+        'subscriptions.UserServiceSubscription',
         on_delete=models.SET_NULL,
         null=True,
         blank=True

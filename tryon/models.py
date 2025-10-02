@@ -18,9 +18,9 @@ class TryOnRequest(models.Model):
 
     human_image = models.ImageField(upload_to='tryon/human_images/', blank=True, null=True)
     garment_image = models.ImageField(upload_to='tryon/garment_images/', blank=True, null=True)
-    human_image_url = models.URLField(blank=True, null=True)
-    garment_image_url = models.URLField(blank=True, null=True)
-    result_image_url = models.URLField(blank=True, null=True)
+    human_image_url = models.URLField(max_length=1000, blank=True, null=True)
+    garment_image_url = models.URLField(max_length=1000, blank=True, null=True)
+    result_image_url = models.URLField(max_length=1000, blank=True, null=True)
 
     status = models.CharField(
         max_length=20,
