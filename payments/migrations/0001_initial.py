@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('subscriptions', '0001_initial'),
-        ('workflows', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
