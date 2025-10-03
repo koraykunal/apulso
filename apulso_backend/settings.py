@@ -283,23 +283,25 @@ if USE_S3:
 FAL_KEY = os.getenv('FAL_KEY', '')
 
 # Email Configuration
+# Priority: Resend (primary) → AWS SES (fallback) → Console (dev)
+RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
 USE_SES = os.getenv('USE_SES', 'False') == 'True'
 
-if USE_SES:
+if RESEND_API_KEY:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.resend.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'resend'
+    EMAIL_HOST_PASSWORD = RESEND_API_KEY
+elif USE_SES:
     EMAIL_BACKEND = 'django_ses.SESBackend'
     AWS_SES_REGION_NAME = os.getenv('AWS_SES_REGION_NAME', 'eu-west-1')
     AWS_SES_REGION_ENDPOINT = f'email.{AWS_SES_REGION_NAME}.amazonaws.com'
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_SES_ACCESS_KEY_ID', os.getenv('AWS_ACCESS_KEY_ID'))
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY', os.getenv('AWS_SECRET_ACCESS_KEY'))
-    AWS_SES_CONFIGURATION_SET = os.getenv('AWS_SES_CONFIGURATION_SET', None)
+    AWS_SES_ACCESS_KEY_ID = os.getenv('AWS_SES_ACCESS_KEY_ID', os.getenv('AWS_ACCESS_KEY_ID'))
+    AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY', os.getenv('AWS_SECRET_ACCESS_KEY'))
 else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_FROM_ADDRESS', 'noreply@apulso.io')
 

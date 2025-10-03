@@ -1,11 +1,14 @@
-from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .models import EmailVerificationToken
 import logging
+import resend
 
 logger = logging.getLogger(__name__)
+
+# Configure Resend API key
+resend.api_key = settings.RESEND_API_KEY if hasattr(settings, 'RESEND_API_KEY') else None
 
 
 def send_verification_email(user, request=None):
@@ -21,16 +24,19 @@ def send_verification_email(user, request=None):
     }
 
     html_message = render_to_string('emails/verify_email.html', context)
-    plain_message = strip_tags(html_message)
 
-    send_mail(
-        subject='Verify Your Email - Apulso',
-        message=plain_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+    try:
+        params = {
+            "from": f"Apulso <{settings.DEFAULT_FROM_EMAIL}>",
+            "to": [user.email],
+            "subject": "Verify Your Email - Apulso",
+            "html": html_message,
+        }
+        resend.Emails.send(params)
+        logger.info(f"Verification email sent to {user.email} via Resend")
+    except Exception as e:
+        logger.error(f"Failed to send verification email via Resend: {str(e)}")
+        raise
 
     return token
 
@@ -43,16 +49,19 @@ def send_password_reset_email(user, reset_url):
     }
 
     html_message = render_to_string('emails/password_reset.html', context)
-    plain_message = strip_tags(html_message)
 
-    send_mail(
-        subject='Şifre Sıfırlama - Apulso',
-        message=plain_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+    try:
+        params = {
+            "from": f"Apulso <{settings.DEFAULT_FROM_EMAIL}>",
+            "to": [user.email],
+            "subject": "Şifre Sıfırlama - Apulso",
+            "html": html_message,
+        }
+        resend.Emails.send(params)
+        logger.info(f"Password reset email sent to {user.email} via Resend")
+    except Exception as e:
+        logger.error(f"Failed to send password reset email via Resend: {str(e)}")
+        raise
 
 
 def send_email_change_verification(user, new_email, token):
@@ -69,13 +78,16 @@ def send_email_change_verification(user, new_email, token):
     }
 
     html_message = render_to_string('emails/email_change.html', context)
-    plain_message = strip_tags(html_message)
 
-    send_mail(
-        subject='Verify Your New Email - Apulso',
-        message=plain_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[new_email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+    try:
+        params = {
+            "from": f"Apulso <{settings.DEFAULT_FROM_EMAIL}>",
+            "to": [new_email],
+            "subject": "Verify Your New Email - Apulso",
+            "html": html_message,
+        }
+        resend.Emails.send(params)
+        logger.info(f"Email change verification sent to {new_email} via Resend")
+    except Exception as e:
+        logger.error(f"Failed to send email change verification via Resend: {str(e)}")
+        raise

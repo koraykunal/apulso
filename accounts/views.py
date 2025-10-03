@@ -111,10 +111,39 @@ def verify_email(request):
             'error': 'Invalid verification token'
         }, status=status.HTTP_400_BAD_REQUEST)
 
+    # Check if user is already verified
+    if token.user.is_verified:
+        refresh = RefreshToken.for_user(token.user)
+        response = Response({
+            'user': UserSerializer(token.user).data,
+            'access': str(refresh.access_token),
+            'message': 'Email already verified. You can now login.',
+            'already_verified': True
+        })
+
+        is_production = not request.META.get('HTTP_HOST', '').startswith('localhost') and not request.META.get('HTTP_HOST', '').startswith('127.0.0.1')
+
+        response.set_cookie(
+            'refresh_token',
+            str(refresh),
+            max_age=30 * 24 * 60 * 60,
+            httponly=True,
+            secure=is_production,
+            samesite='None' if request.META.get('HTTP_ORIGIN') else 'Lax',
+            path='/'
+        )
+
+        return response
+
     if not token.is_valid():
-        return Response({
-            'error': 'Token has expired or already been used'
-        }, status=status.HTTP_400_BAD_REQUEST)
+        if token.is_used:
+            return Response({
+                'error': 'This verification link has already been used. Your email may already be verified.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'error': 'This verification link has expired. Please request a new one.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     user = token.user
     user.is_verified = True

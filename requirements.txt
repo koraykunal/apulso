@@ -8,10 +8,7 @@ celery
 redis
 pillow
 requests
-stripe
 python-dotenv
-dj-rest-auth
-django-allauth
 django-filter
 drf-spectacular
 whitenoise
@@ -20,3 +17,4 @@ fal-client
 boto3
 django-storages
 django-ses
+resend

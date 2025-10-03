@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Koray/WebstormProjects/apulso-front-next/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
