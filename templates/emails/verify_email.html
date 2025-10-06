@@ -5,67 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #000;
+            color: #e5e5e5;
+            max-width: 640px;
             margin: 0 auto;
             padding: 20px;
+            border: 1px solid #222;
+            border-radius: 10px;
+            box-shadow: 0 0 24px rgba(255, 255, 255, 0.05);
         }
-        .container {
-            background-color: #f9fafb;
-            border-radius: 8px;
-            padding: 30px;
-            margin: 20px 0;
-        }
+
         .header {
+            background-color: #101010;
+            color: #fff;
+            padding: 28px 32px;
             text-align: center;
-            margin-bottom: 30px;
+            border-bottom: 1px solid #bababa;
         }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: 20px;
+            text-transform: uppercase;
+        }
+
+        .content {
+            padding: 36px 32px;
+            background-color: #101010;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 0;
+            border-bottom: 1px solid #bababa;
+            padding-bottom: 8px;
+            color: #fff;
+        }
+
+        p {
+            color: #e5e5e5;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
         .button {
             display: inline-block;
-            padding: 12px 30px;
-            background-color: #4F46E5;
-            color: white;
+            padding: 12px 32px;
+            background-color: #fff;
+            color: #000;
             text-decoration: none;
             border-radius: 6px;
-            margin: 20px 0;
+            margin: 24px 0;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
         }
+
+        .button:hover {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+
+        .link {
+            word-break: break-all;
+            color: #fff2cf;
+            font-size: 13px;
+            border-left: 2px solid #fff2cf;
+            padding-left: 8px;
+            margin: 16px 0;
+        }
+
         .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 14px;
-            color: #6b7280;
+            margin-top: 36px;
+            font-size: 12px;
+            color: #777;
             text-align: center;
+            border-top: 1px solid #bababa;
+            padding-top: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>{{ site_name }}</h1>
-        </div>
+<div class="header">
+    <h1>{{ site_name }}</h1>
+</div>
 
-        <h2>Merhaba {{ user.first_name|default:user.username }}!</h2>
+<div class="content">
+    <h2>Merhaba {{ user.first_name|default:user.username }}!</h2>
 
-        <p>{{ site_name }} hesabınızı oluşturduğunuz için teşekkür ederiz.</p>
+    <p>{{ site_name }} hesabınızı oluşturduğunuz için teşekkür ederiz.</p>
 
-        <p>Email adresinizi doğrulamak için lütfen aşağıdaki butona tıklayın:</p>
+    <p>Email adresinizi doğrulamak için lütfen aşağıdaki butona tıklayın:</p>
 
-        <div style="text-align: center;">
-            <a href="{{ verification_url }}" class="button">Email Adresimi Doğrula</a>
-        </div>
-
-        <p>Eğer buton çalışmıyorsa, aşağıdaki linki tarayıcınıza kopyalayıp yapıştırabilirsiniz:</p>
-        <p style="word-break: break-all; color: #4F46E5;">{{ verification_url }}</p>
-
-        <p>Bu link 24 saat boyunca geçerlidir.</p>
-
-        <div class="footer">
-            <p>Bu emaili siz talep etmediyseniz, lütfen görmezden gelin.</p>
-            <p>&copy; 2024 {{ site_name }}. Tüm hakları saklıdır.</p>
-        </div>
+    <div style="text-align: center;">
+        <a href="{{ verification_url }}" class="button">Email Adresimi Doğrula</a>
     </div>
+
+    <p>Eğer buton çalışmıyorsa, aşağıdaki linki tarayıcınıza kopyalayıp yapıştırabilirsiniz:</p>
+    <p class="link">{{ verification_url }}</p>
+
+    <p>Bu link 24 saat boyunca geçerlidir.</p>
+
+    <div class="footer">
+        <p>Bu emaili siz talep etmediyseniz, lütfen görmezden gelin.</p>
+        <p>&copy; 2025 {{ site_name }}. Tüm hakları saklıdır.</p>
+    </div>
+</div>
 </body>
 </html>
